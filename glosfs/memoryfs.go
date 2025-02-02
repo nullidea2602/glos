@@ -7,6 +7,7 @@ import (
 )
 
 var MemoryFS = make(map[string]string) // In-memory file system
+var GlosEnv = make(map[string]string)  // In-memory environment storage
 const fsFilename = "memoryfs.dat"      // Persistent storage file
 const utilsDir = "utils"
 

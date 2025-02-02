@@ -1,5 +1,5 @@
 if not args or #args == 0 then
-    print("Usage: lua print_file.lua <filename>")
+    print("Usage: cat <filename>")
     return
 end
 
