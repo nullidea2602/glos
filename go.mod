@@ -1,4 +1,4 @@
-module github.com/nullidea2602/glos
+module glos
 
 go 1.23.5
 
