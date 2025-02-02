@@ -8,6 +8,6 @@ local filename = args[1]
 local content = ""
 
 print("Enter content line by line. Type ':exit' to finish.")
-content = read_multiline_input()
+content = read_multiline_input_raylib()
 
 write_file(filename, content)

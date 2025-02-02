@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"glos/glosfs"
+	"glos/ui"
 	"os"
 	"strings"
 
@@ -20,10 +21,12 @@ func Execute(content string, args []string) error {
 	L.SetGlobal("list_files", L.NewFunction(luaListFiles))
 	L.SetGlobal("write_file", L.NewFunction(luaWriteFile))
 	L.SetGlobal("read_multiline_input", L.NewFunction(luaReadMultilineInput))
+	L.SetGlobal("read_multiline_input_raylib", L.NewFunction(luaReadMultilineInputRaylib))
 	L.SetGlobal("delete_file", L.NewFunction(luaDeleteFile))
 	L.SetGlobal("set_env", L.NewFunction(luaSetEnv))
 	L.SetGlobal("get_env", L.NewFunction(luaGetEnv))
 	L.SetGlobal("clear_screen", L.NewFunction(luaClearScreen))
+	L.SetGlobal("print", L.NewFunction(luaPrint))
 
 	luaTable := L.NewTable()
 	for i, arg := range args {
@@ -96,6 +99,23 @@ func luaReadMultilineInput(L *lua.LState) int {
 	return 1
 }
 
+func luaReadMultilineInputRaylib(L *lua.LState) int {
+	input := ""
+	maxInputLen := 256
+	var content strings.Builder
+
+	for input != ":exit" {
+		ui.DrawUI(input)
+
+		if ui.HandleInput(&input, maxInputLen) {
+			content.WriteString(input + "\n")
+			input = ""
+		}
+	}
+	L.Push(lua.LString(content.String()))
+	return 1
+}
+
 // Example usage in Lua, including error handling:
 // success, error_message = delete_file("filename")
 // if not success then
@@ -146,6 +166,15 @@ func luaGetEnv(L *lua.LState) int {
 // Example usage in Lua:
 // clear_screen()
 func luaClearScreen(L *lua.LState) int {
-	fmt.Print("\033[2J\033[H") // ANSI code: Clear screen and move cursor to home
+	ui.Output = ""
+	return 0
+}
+
+func luaPrint(L *lua.LState) int {
+	n := L.GetTop()
+	for i := 1; i <= n; i++ {
+		ui.Output += L.ToString(i)
+	}
+	ui.Output += "\n"
 	return 0
 }
