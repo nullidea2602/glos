@@ -1,15 +1,14 @@
--- Desc: Read a file and print its content
-
-if not args[1] then
+if not args or #args == 0 then
     print("Usage: lua print_file.lua <filename>")
-else
-
-    local file_to_read = args[1]
-    local content, err = read_file(file_to_read)
-    if content then
-        print(content)
-    else
-        print("Error:", err)
-    end
-
+    return
 end
+
+local file_to_read = args[1]
+local content, err = read_file(file_to_read)
+
+if not content then
+    print("Error:", err)
+    return
+end
+
+print(content)
