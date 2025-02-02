@@ -1,7 +1,3 @@
-Here’s a draft for your project’s README file:
-
----
-
 # GLOS (Go/Lua OS)
 
 GLOS is a fun experiment in lightweight userland toy OS development that blends Go and Lua, providing a simple yet flexible platform for script execution and file manipulation. It features an in-memory filesystem, environment variables, and a Lua-based command API for seamless interaction.
@@ -78,7 +74,7 @@ Several example scripts demonstrate the API usage:
 
 Run scripts using the REPL:
 
-```sh
+```
 glos> run ls.lua
 Files in memory:
 - test.txt
