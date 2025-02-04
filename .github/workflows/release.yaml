@@ -2,12 +2,15 @@ name: Build and Release GLOS
 
 on:
   push:
-    branches:
-      - main  # Triggers when merging a release into main
+    tags:
+      - "v*"  # Trigger only when a version tag is pushed
   pull_request:
     branches:
       - dev  # Runs tests on dev and feature branches
   workflow_dispatch:  # Allows manual triggering
+
+permissions:
+  contents: write  # Ensure GitHub Actions can create releases
 
 jobs:
   test:
