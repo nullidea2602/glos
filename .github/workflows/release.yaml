@@ -3,14 +3,10 @@ name: Build and Release GLOS
 on:
   push:
     tags:
-      - "v*"  # Trigger only when a version tag is pushed
-  pull_request:
-    branches:
-      - dev  # Runs tests on dev and feature branches
-  workflow_dispatch:  # Allows manual triggering
+      - "v*.*.*"  # Ensure it runs when a version tag is pushed
 
 permissions:
-  contents: write  # Ensure GitHub Actions can create releases
+  contents: write
 
 jobs:
   test:
@@ -34,14 +30,12 @@ jobs:
   release:
     name: Build and Release
     runs-on: ubuntu-latest
-    needs: test  # Runs only if tests pass
-    if: github.ref == 'refs/heads/main'
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/')  # Ensure it runs only for tags
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Ensures we can get tags
 
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libglfw3-dev libwayland-dev libxkbcommon-dev libxrandr-dev libxi-dev libudev-dev libxcursor-dev libxinerama-dev
@@ -51,20 +45,9 @@ jobs:
         with:
           go-version: '1.21'
 
-      - name: Determine Version
-        id: get_version
-        run: |
-          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [ -z "$TAG" ]; then
-            TAG="v$(date +'%Y.%m.%d')"
-            git tag $TAG
-            git push origin $TAG
-          fi
-          echo "VERSION=$TAG" >> $GITHUB_ENV
-
       - name: Build binary
         run: |
-          go build -o glos main.go  # Change output name if needed
+          go build -o glos main.go
 
       - name: Archive binary
         run: tar -czvf glos-linux-amd64.tar.gz glos
@@ -72,11 +55,11 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.VERSION }}
-          name: "Release ${{ env.VERSION }}"
-          body: "Auto-generated release for version ${{ env.VERSION }}"
+          tag_name: ${{ github.ref_name }}
+          name: "Release ${{ github.ref_name }}"
+          body: "Auto-generated release for version ${{ github.ref_name }}"
           draft: false
-          prerelease: true  # Mark as a pre-release if it's below 1.0.0
+          prerelease: true
           files: glos-linux-amd64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
