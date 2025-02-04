@@ -19,7 +19,7 @@ const (
 func main() {
 	glosfs.LoadMemoryFS() // Load memoryFS on start
 
-	rl.InitWindow(windowWidth, windowHeight, "GLOS GUI")
+	rl.InitWindow(windowWidth, windowHeight, "GLOS")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 
@@ -31,6 +31,7 @@ func main() {
 		if ui.HandleInput(&input, maxInputLen) {
 			runLuaCommand(strings.ToLower(input))
 			input = ""
+			ui.Output += "> "
 		}
 	}
 

@@ -103,15 +103,21 @@ func luaReadMultilineInputRaylib(L *lua.LState) int {
 	input := ""
 	maxInputLen := 256
 	var content strings.Builder
+	shouldExit := false
 
-	for input != ":exit" {
+	for !shouldExit {
 		ui.DrawUI(input)
 
 		if ui.HandleInput(&input, maxInputLen) {
+			if input == ":exit" {
+				shouldExit = true
+				break
+			}
 			content.WriteString(input + "\n")
 			input = ""
 		}
 	}
+	ui.Output += "\n"
 	L.Push(lua.LString(content.String()))
 	return 1
 }
