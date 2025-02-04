@@ -23,10 +23,10 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21'  # Adjust to your Go version
+          go-version: '1.21'
 
       - name: Run tests
-        run: go test ./...  # Make sure you have tests in place!
+        run: go test ./...
 
   release:
     name: Build and Release
@@ -37,24 +37,34 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libglfw3-dev libwayland-dev libxkbcommon-dev libxrandr-dev libxi-dev libudev-dev
+        with:
+          fetch-depth: 0  # Ensures we can get tags
 
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libglfw3-dev libwayland-dev libxkbcommon-dev libxrandr-dev libxi-dev libudev-dev libxcursor-dev libxinerama-dev
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
 
+      - name: Determine Version
+        id: get_version
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$TAG" ]; then
+            TAG="v$(date +'%Y.%m.%d')"
+            git tag $TAG
+            git push origin $TAG
+          fi
+          echo "VERSION=$TAG" >> $GITHUB_ENV
+
       - name: Build binary
         run: |
           go build -o glos main.go  # Change output name if needed
 
       - name: Archive binary
-        run: |
-          tar -czvf glos-linux-amd64.tar.gz glos
-          echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+        run: tar -czvf glos-linux-amd64.tar.gz glos
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
