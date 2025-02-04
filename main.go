@@ -5,6 +5,7 @@ import (
 	"glos/glosfs"
 	"glos/luaexec"
 	"glos/ui"
+	"os"
 	"strings"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -48,6 +49,7 @@ func runLuaCommand(input string) {
 	switch command {
 	case "exit":
 		glosfs.SaveMemoryFS() // Save memoryFS before exit
+		os.Exit(0)
 	case "run":
 		runLua(param)
 	default:
